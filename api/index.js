@@ -9,8 +9,6 @@ app.use(express.json());
 
 // JWT 비밀 키 (환경 변수로 설정 가능)
 const SECRET_KEY = '8f5c8b3a1e23f4c95a2d1d17f3018e7b8271a8c85b69d7e9e202b657e52c8207';
-  console.log('SECRET_KEY:', process.env.SECRET_KEY);  // 환경 변수 확인
-
 const users = { user1: 'password1', admin: 'admin123' };
 
 // 기본 경로
@@ -22,20 +20,13 @@ app.get('/', (req, res) => {
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
   if (users[username] && users[username] === password) {
-    try {
-      console.log('Secret Key:', process.env.SECRET_KEY); // 환경 변수 확인
-      const token = jwt.sign({ username }, process.env.SECRET_KEY, { expiresIn: '1h' });
-      console.log('Generated Token:', token); // 토큰 생성 확인
-      res.json({ success: true, message: 'Login successful', token });
-    } catch (error) {
-      console.error('Error generating token:', error);
-      res.status(500).json({ success: false, message: 'Internal server error.' });
-    }
+    // JWT 발행
+    const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: '1h' }); // 유효 기간: 1시간
+    res.json({ success: true, message: 'Login successful', token });
   } else {
     res.status(401).json({ success: false, message: 'Invalid username or password.' });
   }
 });
-
 
 // JWT 검증 API
 app.post('/verifyToken', (req, res) => {
