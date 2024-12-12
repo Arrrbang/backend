@@ -9,6 +9,8 @@ app.use(express.json());
 
 // JWT 비밀 키 (환경 변수로 설정 가능)
 const SECRET_KEY = process.env.SECRET_KEY
+  console.log('SECRET_KEY:', process.env.SECRET_KEY);  // 환경 변수 확인
+
 const users = { user1: 'password1', admin: 'admin123' };
 
 // 기본 경로
