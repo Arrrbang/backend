@@ -22,13 +22,20 @@ app.get('/', (req, res) => {
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
   if (users[username] && users[username] === password) {
-    // JWT 발행
-    const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: '1h' }); // 유효 기간: 1시간
-    res.json({ success: true, message: 'Login successful', token });
+    try {
+      console.log('Secret Key:', process.env.SECRET_KEY); // 환경 변수 확인
+      const token = jwt.sign({ username }, process.env.SECRET_KEY, { expiresIn: '1h' });
+      console.log('Generated Token:', token); // 토큰 생성 확인
+      res.json({ success: true, message: 'Login successful', token });
+    } catch (error) {
+      console.error('Error generating token:', error);
+      res.status(500).json({ success: false, message: 'Internal server error.' });
+    }
   } else {
     res.status(401).json({ success: false, message: 'Invalid username or password.' });
   }
 });
+
 
 // JWT 검증 API
 app.post('/verifyToken', (req, res) => {
