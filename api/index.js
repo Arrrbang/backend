@@ -1,23 +1,11 @@
 const express = require('express');
 const cors = require('cors'); // CORS 모듈 추가
 const jwt = require('jsonwebtoken'); // JWT 모듈 추가
-const { Client } = require('@notionhq/client'); // 노션 API 클라이언트 추가
 
 const app = express();
 
 app.use(cors()); // CORS 설정 적용
 app.use(express.json());
-app.options('*', cors()); // 모든 경로에 대해 OPTIONS 요청 허용 노션업데이트
-
-// CORS 설정 -- 노션업데이트용----------------
-app.use(cors({
-  origin: 'https://arrrbang.github.io', // 허용할 프론트엔드 도메인
-  methods: ['GET', 'POST', 'OPTIONS'], // 허용할 HTTP 메서드
-  allowedHeaders: ['Content-Type', 'Authorization'], // 허용할 헤더
-  credentials: true // 쿠키 인증이 필요한 경우
-}));
-//----------------------------------------
-
 
 // JWT 비밀 키 (환경 변수로 설정 가능)
 const SECRET_KEY = process.env.SECRET_KEY;
@@ -81,18 +69,4 @@ app.get('/protected', authenticateToken, (req, res) => {
   res.json({ success: true, message: `Hello ${req.user.username}, you have access to this route.` });
 });
 
-
-// 노션 데이터 조회 API------------------------------------------
-app.get('/notion', async (req, res) => {
-  try {
-    const response = await notion.databases.query({
-      database_id: process.env.NOTION_DATABASE_ID
-    });
-    res.status(200).json(response);
-  } catch (error) {
-    console.error('Error fetching Notion data:', error.message); // 로그 확인
-    res.status(500).json({ error: error.message });
-  }
-});
-//---------------------------------------------------------------
 module.exports = app;
