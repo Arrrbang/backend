@@ -70,9 +70,8 @@ app.get('/protected', authenticateToken, (req, res) => {
   res.json({ success: true, message: `Hello ${req.user.username}, you have access to this route.` });
 });
 
-module.exports = app;
 
-// 노션 데이터 조회 API
+// 노션 데이터 조회 API------------------------------------------
 app.get('/notion', async (req, res) => {
   try {
     const response = await notion.databases.query({
@@ -80,9 +79,9 @@ app.get('/notion', async (req, res) => {
     });
     res.status(200).json(response);
   } catch (error) {
-    console.error('Error fetching Notion data:', error.message);
+    console.error('Error fetching Notion data:', error.message); // 로그 확인
     res.status(500).json({ error: error.message });
   }
 });
-
+//---------------------------------------------------------------
 module.exports = app;
