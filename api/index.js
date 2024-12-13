@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors'); // CORS 모듈 추가
 const jwt = require('jsonwebtoken'); // JWT 모듈 추가
+const { Client } = require('@notionhq/client'); // 노션 API 클라이언트 추가
 
 const app = express();
 
@@ -10,7 +11,10 @@ app.use(express.json());
 // JWT 비밀 키 (환경 변수로 설정 가능)
 const SECRET_KEY = process.env.SECRET_KEY;
 const users = { user1: 'password1', admin: 'admin123' };
-  console.log('JWT Secret Key:', SECRET_KEY); // 테스트용 출력 (배포 시 삭제)
+
+// 노션 API 클라이언트 초기화
+const notion = new Client({ auth: process.env.NOTION_API_KEY });
+
 // 기본 경로
 app.get('/', (req, res) => {
   res.send('Server is running!');
@@ -64,6 +68,21 @@ function authenticateToken(req, res, next) {
 // 보호된 API 예시
 app.get('/protected', authenticateToken, (req, res) => {
   res.json({ success: true, message: `Hello ${req.user.username}, you have access to this route.` });
+});
+
+module.exports = app;
+
+// 노션 데이터 조회 API
+app.get('/notion', async (req, res) => {
+  try {
+    const response = await notion.databases.query({
+      database_id: process.env.NOTION_DATABASE_ID
+    });
+    res.status(200).json(response);
+  } catch (error) {
+    console.error('Error fetching Notion data:', error.message);
+    res.status(500).json({ error: error.message });
+  }
 });
 
 module.exports = app;
