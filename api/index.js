@@ -10,7 +10,6 @@ app.use(express.json());
 // JWT 비밀 키 (환경 변수로 설정 가능)
 const SECRET_KEY = process.env.SECRET_KEY;
 const users = JSON.parse(process.env.USERS || '{}');
-console.log(users);
 
 // 기본 경로
 app.get('/', (req, res) => {
