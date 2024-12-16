@@ -8,7 +8,7 @@ app.use(cors()); // CORS 설정 적용
 app.use(express.json());
 
 // JWT 비밀 키 (환경 변수로 설정 가능)
-const SECRET_KEY = '8f5c8b3a1e23f4c95a2d1d17f3018e7b8271a8c85b69d7e9e202b657e52c8207';
+const SECRET_KEY = process.env.SECRET_KEY;
 const users = { user1: 'password1', admin: 'admin123' };
 // 기본 경로
 app.get('/', (req, res) => {
