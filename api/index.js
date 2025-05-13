@@ -21,7 +21,7 @@ app.post('/login', (req, res) => {
   const { username, password } = req.body;
   if (users[username] && users[username] === password) {
     // JWT 발행
-    const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: '1h' }); // 유효 기간: 1시간
+    const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: '3h' }); // 유효 기간: 3시간
     res.json({ success: true, message: 'Login successful', token });
   } else {
     res.status(401).json({ success: false, message: 'Invalid username or password.' });
