@@ -66,4 +66,6 @@ app.get('/protected', authenticateToken, (req, res) => {
   res.json({ success: true, message: `Hello ${req.user.username}, you have access to this route.` });
 });
 
+app.post('/api/isf/generate', authenticateToken, require('./isf/generate'));
+
 module.exports = app;
