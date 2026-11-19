@@ -43,14 +43,14 @@ async function build(data,template){
  if(!scac||!Array.isArray(data.people)||![1,2].includes(data.people.length))throw Error('포워딩과 HBL을 확인해 주세요.');
  if(!/^[A-Za-z]{4}/.test(clean(data.mbl)))throw Error('MBL 번호 앞에 선사 코드 영문 4자를 입력해 주세요.');
  if(['etd','eta','vessel','voyage'].some(k=>!clean(data[k])))throw Error('ETD, ETA, 선명과 항차를 확인해 주세요.');
- const required=['hbl','name','origin1','destination','quantity','weight','pol','pod','finalDestination'];
- if(data.people.some(p=>required.some(k=>!clean(p[k]))))throw Error('각 HBL의 주소, 항구, 최종 목적지와 수량·중량을 확인해 주세요.');
+ const required=['hbl','name','origin1','destination','quantity','weight'];
+ if(data.people.some(p=>required.some(k=>!clean(p[k]))))throw Error('각 HBL의 주소와 수량·중량을 확인해 주세요.');
  const zip=await JSZip.loadAsync(template);let styles=await zip.file('xl/styles.xml').async('string');
  for(let i=0;i<data.people.length;i++){
   const p=data.people[i],file=`xl/worksheets/sheet${i+1}.xml`;let xml=await zip.file(file).async('string');
   const origin=[clean(p.origin1),clean(p.origin2)].filter(Boolean).join('\n'),destination=[clean(p.destination),clean(p.destination2)].filter(Boolean).join('\n');
   const kr=clean(p.name)+' // '+origin,us=clean(p.name)+' // '+destination,hbl=clean(p.hbl).replace(/-/g,'');
-  const pol=clean(p.pol), vals={B5:kr,D5:kr,B7:us,D7:us,C18:clean(data.mbl),C19:clean(data.mbl).slice(0,4).toUpperCase(),E18:hbl,E19:scac,C20:scac+' '+hbl,C21:clean(data.vessel),C22:clean(data.voyage),C23:/KOREA/i.test(pol)?pol:pol+', KOREA',C24:clean(p.pod),C25:clean(p.finalDestination),E21:clean(p.quantity)+' CT',E22:clean(p.weight)+' KG'};
+  const vals={B5:kr,D5:kr,B7:us,D7:us,C18:clean(data.mbl),C19:clean(data.mbl).slice(0,4).toUpperCase(),E18:hbl,E19:scac,C20:scac+' '+hbl,C21:clean(data.vessel),C22:clean(data.voyage),E21:clean(p.quantity)+' CT',E22:clean(p.weight)+' KG'};
   for(const [ref,val] of Object.entries(vals))xml=cell(xml,ref,val);
   for(const [ref,val] of [['E23',data.etd],['E24',data.eta],['E25',data.eta]])xml=cell(xml,ref,dateSerial(val),true);
   ({xml,styles}=enableWrap(zip,xml,styles));zip.file(file,xml);
