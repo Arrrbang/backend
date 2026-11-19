@@ -29,7 +29,7 @@ async function build(data,template,city){
   const p=data.people[i],file=`xl/worksheets/sheet${i+1}.xml`;let xml=await zip.file(file).async('string');
   const scac={ '주성':'JSSY', '람세스':'RLCL' }[data.forwarder];
   const number=clean(p.container).split('/')[0].trim();
-  const vals={A10:clean(p.name),A11:clean(p.origin1),A12:clean(p.origin2),A13:'',E10:clean(p.name),E11:clean(p.origin1),E12:clean(p.origin2),A15:clean(p.name),A16:clean(p.destination),A17:clean(p.destination2),A18:'',E20:clean(p.passport),E22:'REPUBLIC OF KOREA',A24:scac+' '+clean(p.hbl).replace(/-/g,''),C24:clean(data.mbl),A26:clean(data.vessel)+' '+clean(data.voyage),E26:number};
+  const vals={A10:clean(p.name),A11:clean(p.origin1),A12:clean(p.origin2),A13:clean(p.origin3),E10:clean(p.name),E11:clean(p.origin1),E12:clean(p.origin2),E13:clean(p.origin3),A15:clean(p.name),A16:clean(p.destination),A17:clean(p.destination2),A18:clean(p.destination3),E20:clean(p.passport),E22:'REPUBLIC OF KOREA',A24:scac+' '+clean(p.hbl).replace(/-/g,''),C24:clean(data.mbl),A26:clean(data.vessel)+' '+clean(data.voyage),E26:number};
   for(const [ref,val] of Object.entries(vals))xml=cell(xml,ref,val);
   xml=cell(xml,'A22',dateSerial(p.birth),true);xml=cell(xml,'F24',dateSerial(data.etd),true);xml=cell(xml,'G24',dateSerial(data.eta),true);
   zip.file(file,xml);

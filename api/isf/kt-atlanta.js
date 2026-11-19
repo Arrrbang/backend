@@ -35,7 +35,7 @@ function enableWrap(zip, xml, styles) {
  }
  block=block.replace(/(<cellXfs\b[^>]*\bcount=")\d+("[^>]*>)/,`$1${xfs.length}$2`);styles=styles.replace(xfBlock[0],block);
  // 두 줄 주소가 셀에 표시될 수 있도록 병합된 행의 높이를 확보합니다.
- for(const row of [5,7])xml=xml.replace(new RegExp(`<row\\b(?=[^>]*\\br="${row}")[^>]*>`),v=>v.replace(/\s+ht="[^"]*"/g,'').replace(/\s+customHeight="[^"]*"/g,'').replace(/>$/,' ht="48" customHeight="1">'));
+ for(const row of [5,7])xml=xml.replace(new RegExp(`<row\\b(?=[^>]*\\br="${row}")[^>]*>`),v=>v.replace(/\s+ht="[^"]*"/g,'').replace(/\s+customHeight="[^"]*"/g,'').replace(/>$/,' ht="72" customHeight="1">'));
  return {xml,styles};
 }
 async function build(data,template){
@@ -48,7 +48,7 @@ async function build(data,template){
  const zip=await JSZip.loadAsync(template);let styles=await zip.file('xl/styles.xml').async('string');
  for(let i=0;i<data.people.length;i++){
   const p=data.people[i],file=`xl/worksheets/sheet${i+1}.xml`;let xml=await zip.file(file).async('string');
-  const origin=[clean(p.origin1),clean(p.origin2)].filter(Boolean).join('\n'),destination=[clean(p.destination),clean(p.destination2)].filter(Boolean).join('\n');
+  const origin=[clean(p.origin1),clean(p.origin2),clean(p.origin3)].filter(Boolean).join('\n'),destination=[clean(p.destination),clean(p.destination2),clean(p.destination3)].filter(Boolean).join('\n');
   const kr=clean(p.name)+' // '+origin,us=clean(p.name)+' // '+destination,hbl=clean(p.hbl).replace(/-/g,'');
   const vals={B5:kr,D5:kr,B7:us,D7:us,C18:clean(data.mbl),C19:clean(data.mbl).slice(0,4).toUpperCase(),E18:hbl,E19:scac,C20:scac+' '+hbl,C21:clean(data.vessel),C22:clean(data.voyage),E21:clean(p.quantity)+' CT',E22:clean(p.weight)+' KG'};
   for(const [ref,val] of Object.entries(vals))xml=cell(xml,ref,val);
