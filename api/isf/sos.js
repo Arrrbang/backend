@@ -20,14 +20,14 @@ function dateSerial(s){
  return Math.round((t-Date.UTC(1899,11,30))/86400000);
 }
 async function build(data,template,city){
- if(!({ '주성':'JSSY','람세스':'RLCL' }[data?.forwarder])||!Array.isArray(data.people)||![1,2].includes(data.people.length))throw Error('포워딩과 HBL을 확인해 주세요.');
+ if(!({ '주성':'JSSY','람세스':'RLCL','중앙':'CEPV','티엔케이':'GGBO','로지피아':'LCFF' }[data?.forwarder])||!Array.isArray(data.people)||![1,2].includes(data.people.length))throw Error('포워딩과 HBL을 확인해 주세요.');
  if(['mbl','etd','eta','vessel','voyage'].some(k=>!clean(data[k])))throw Error('MBL과 ETD를 입력해 주세요.');
  const required=['hbl','name','passport','birth','origin1','destination','container'];
  if(data.people.some(p=>required.some(k=>!clean(p[k]))))throw Error('각 HBL의 필수 항목을 확인해 주세요.');
  const zip=await JSZip.loadAsync(template);
  for(let i=0;i<data.people.length;i++){
   const p=data.people[i],file=`xl/worksheets/sheet${i+1}.xml`;let xml=await zip.file(file).async('string');
-  const scac={ '주성':'JSSY', '람세스':'RLCL' }[data.forwarder];
+  const scac={ '주성':'JSSY', '람세스':'RLCL','중앙':'CEPV','티엔케이':'GGBO','로지피아':'LCFF' }[data.forwarder];
   const number=clean(p.container).split('/')[0].trim();
   const vals={A10:clean(p.name),A11:clean(p.origin1),A12:clean(p.origin2),A13:clean(p.origin3),E10:clean(p.name),E11:clean(p.origin1),E12:clean(p.origin2),E13:clean(p.origin3),A15:clean(p.name),A16:clean(p.destination),A17:clean(p.destination2),A18:clean(p.destination3),E20:clean(p.passport),E22:'REPUBLIC OF KOREA',A24:scac+' '+clean(p.hbl).replace(/-/g,''),C24:clean(data.mbl),A26:clean(data.vessel)+' '+clean(data.voyage),E26:number};
   for(const [ref,val] of Object.entries(vals))xml=cell(xml,ref,val);

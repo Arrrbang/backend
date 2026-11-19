@@ -39,7 +39,7 @@ function enableWrap(zip, xml, styles) {
  return {xml,styles};
 }
 async function build(data,template){
- const scac={'주성':'JSSY','람세스':'RLCL'}[data?.forwarder];
+ const scac={'주성':'JSSY','람세스':'RLCL','중앙':'CEPV','티엔케이':'GGBO','로지피아':'LCFF'}[data?.forwarder];
  if(!scac||!Array.isArray(data.people)||![1,2].includes(data.people.length))throw Error('포워딩과 HBL을 확인해 주세요.');
  if(!/^[A-Za-z]{4}/.test(clean(data.mbl)))throw Error('MBL 번호 앞에 선사 코드 영문 4자를 입력해 주세요.');
  if(['etd','eta','vessel','voyage'].some(k=>!clean(data[k])))throw Error('ETD, ETA, 선명과 항차를 확인해 주세요.');
