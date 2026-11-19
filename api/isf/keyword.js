@@ -20,14 +20,14 @@ function dateSerial(s){
  return Math.round((t-Date.UTC(1899,11,30))/86400000);
 }
 async function build(data,template){
- if(data?.forwarder!=='주성'||!Array.isArray(data.people)||![1,2].includes(data.people.length))throw Error('포워딩과 HBL을 확인해 주세요.');
+ if(!({ '주성':'JSSY','람세스':'RLCL' }[data?.forwarder])||!Array.isArray(data.people)||![1,2].includes(data.people.length))throw Error('포워딩과 HBL을 확인해 주세요.');
  if(['mbl','etd'].some(k=>!clean(data[k])))throw Error('MBL과 ETD를 입력해 주세요.');
  const required=['hbl','name','passport','birth','origin1','destination','quantity','container','pol','pod'];
  if(data.people.some(p=>required.some(k=>!clean(p[k]))))throw Error('각 HBL의 필수 항목을 확인해 주세요.');
  const zip=await JSZip.loadAsync(template);
  for(let i=0;i<data.people.length;i++){
   const p=data.people[i],file=`xl/worksheets/sheet${i+1}.xml`;let xml=await zip.file(file).async('string');
-  const vals={D6:clean(data.mbl),G6:clean(p.hbl).replace(/-/g,''),I6:'JSSY',D7:clean(p.name),D8:clean(p.passport),D9:'REPUBLIC OF KOREA',E8:clean(p.origin1),E9:clean(p.origin2),E10:'',E11:'',H8:clean(p.destination),H9:clean(p.destination2),H10:'',H11:'',H13:clean(p.container),B19:clean(p.pol),E19:clean(p.pod),G22:clean(p.quantity)+'C/T'};
+  const vals={D6:clean(data.mbl),G6:clean(p.hbl).replace(/-/g,''),I6:({ '주성':'JSSY','람세스':'RLCL' }[data.forwarder]),D7:clean(p.name),D8:clean(p.passport),D9:'REPUBLIC OF KOREA',E8:clean(p.origin1),E9:clean(p.origin2),E10:'',E11:'',H8:clean(p.destination),H9:clean(p.destination2),H10:'',H11:'',H13:clean(p.container),B19:clean(p.pol),E19:clean(p.pod),G22:clean(p.quantity)+'C/T'};
   for(const [ref,val] of Object.entries(vals))xml=cell(xml,ref,val);
   xml=cell(xml,'D10',dateSerial(p.birth),true);xml=cell(xml,'H19',dateSerial(data.etd),true);zip.file(file,xml);
  }

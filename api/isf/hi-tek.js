@@ -10,14 +10,14 @@ function setCell(xml, ref, value) {
  return xml.replace(re,`<c${attrs} t="inlineStr"><is><t xml:space="preserve">${escapeXml(value)}</t></is></c>`);
 }
 async function build(data, template) {
- if (!data || data.forwarder !== '주성' || !Array.isArray(data.people) || ![1,2].includes(data.people.length)) throw Error('포워딩과 1~2건의 HBL을 확인해 주세요.');
+ if (!data || !({'주성':'JSSY','람세스':'RLCL'}[data.forwarder]) || !Array.isArray(data.people) || ![1,2].includes(data.people.length)) throw Error('포워딩과 1~2건의 HBL을 확인해 주세요.');
  const str=v=>typeof v==='string'?v.trim().slice(0,500):'';
  const common=['mbl','etd','vessel','voyage']; if(common.some(x=>!str(data[x])))throw Error('MBL, ETD, 선명, 항차를 입력해 주세요.');
  if(data.people.some(p=>['hbl','name','origin1','destination','passport','birth','quantity','weight'].some(k=>!str(p[k]))))throw Error('각 HBL의 필수 항목을 확인해 주세요.');
  const z=await JSZip.loadAsync(template);const names=['NAME1','NAME2'];
  for(let i=0;i<data.people.length;i++){
   const p=data.people[i];const file=`xl/worksheets/sheet${i+1}.xml`;let xml=await z.file(file).async('string');
-  const values={A6:`AMS SCAC CODE # JSSY / MASTER B.L#: ${str(data.mbl)}   /HOUSE B.L#: JSSY ${str(p.hbl)}`,E6:`Vessel Name: ${str(data.vessel)}     Voyage: ${str(data.voyage)}  Q'TY: ${str(p.quantity)}  Weight: ${str(p.weight)} kg  ETD: ${str(data.etd)}`,A10:str(p.name),A11:str(p.origin1),A12:str(p.origin2),A17:str(p.destination),A18:str(p.destination2),A29:`여권 번호: ${str(p.passport)} 여권 발행국:REPUBLIC OF KOREA 생년월일: ${str(p.birth)}`};
+  const values={A6:`AMS SCAC CODE # ${({'주성':'JSSY','람세스':'RLCL'}[data.forwarder])} / MASTER B.L#: ${str(data.mbl)}   /HOUSE B.L#: ${({'주성':'JSSY','람세스':'RLCL'}[data.forwarder])} ${str(p.hbl)}`,E6:`Vessel Name: ${str(data.vessel)}     Voyage: ${str(data.voyage)}  Q'TY: ${str(p.quantity)}  Weight: ${str(p.weight)} kg  ETD: ${str(data.etd)}`,A10:str(p.name),A11:str(p.origin1),A12:str(p.origin2),A17:str(p.destination),A18:str(p.destination2),A29:`여권 번호: ${str(p.passport)} 여권 발행국:REPUBLIC OF KOREA 생년월일: ${str(p.birth)}`};
   // 복사본은 수식 계산기 유무와 관계없이 같은 내용을 바로 표시합니다.
   Object.assign(values, {
    E10: values.A10, E11: values.A11, E12: values.A12,
