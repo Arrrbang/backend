@@ -4,7 +4,7 @@ const path = require('path');
 const JSZip = require('jszip');
 const escapeXml = value => String(value || '').replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g,'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 function setCell(xml, ref, value) {
- const re = new RegExp(`<c\\b(?=[^>]*\\br="${ref}")[^>]*(?:\\/>|>[\\s\\S]*?<\\/c>)`);
+ const re = new RegExp(`<c\\b(?=[^>]*\\br="${ref}")[^>]*?(?:\\/>|>[\\s\\S]*?<\\/c>)`);
  const match=xml.match(re); if(!match) throw Error(`양식에 ${ref} 셀이 없습니다.`);
  const attrs=match[0].match(/^<c\b([^>]*?)(?:\/>|>)/)[1].replace(/\s+t="[^"]*"/g,'');
  return xml.replace(re,`<c${attrs} t="inlineStr"><is><t xml:space="preserve">${escapeXml(value)}</t></is></c>`);
@@ -18,6 +18,12 @@ async function build(data, template) {
  for(let i=0;i<data.people.length;i++){
   const p=data.people[i];const file=`xl/worksheets/sheet${i+1}.xml`;let xml=await z.file(file).async('string');
   const values={A6:`AMS SCAC CODE # JSSY / MASTER B.L#: ${str(data.mbl)}   /HOUSE B.L#: JSSY ${str(p.hbl)}`,E6:`Vessel Name: ${str(data.vessel)}     Voyage: ${str(data.voyage)}  Q'TY: ${str(p.quantity)}  Weight: ${str(p.weight)} kg  ETD: ${str(data.etd)}`,A10:str(p.name),A11:str(p.origin1),A12:str(p.origin2),A17:str(p.destination),A18:str(p.destination2),A29:`여권 번호: ${str(p.passport)} 여권 발행국:REPUBLIC OF KOREA 생년월일: ${str(p.birth)}`};
+  // 복사본은 수식 계산기 유무와 관계없이 같은 내용을 바로 표시합니다.
+  Object.assign(values, {
+   E10: values.A10, E11: values.A11, E12: values.A12,
+   A16: values.A10, E16: values.A10,
+   E17: values.A17, E18: values.A18, E29: values.A29
+  });
   for(const [ref,value] of Object.entries(values))xml=setCell(xml,ref,value);
   // Clear stale cached formula values; Excel will recalculate the formulas.
   xml=xml.replace(/(<c\b[^>]*>\s*<f[^>]*>[\s\S]*?<\/f>)\s*<v[^>]*>[\s\S]*?<\/v>/g,'$1');
