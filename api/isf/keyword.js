@@ -27,7 +27,7 @@ async function build(data,template){
  const zip=await JSZip.loadAsync(template);
  for(let i=0;i<data.people.length;i++){
   const p=data.people[i],file=`xl/worksheets/sheet${i+1}.xml`;let xml=await zip.file(file).async('string');
-  const vals={D6:clean(data.mbl),G6:'PMX'+clean(p.hbl).replace(/-/g,''),I6:'JSSY',D7:clean(p.name),D8:clean(p.passport),D9:'REPUBLIC OF KOREA',E8:clean(p.origin1),E9:clean(p.origin2),E10:'',E11:'',H8:clean(p.destination),H9:clean(p.destination2),H10:'',H11:'',H13:clean(p.container),B19:clean(p.pol),E19:clean(p.pod),G22:clean(p.quantity)+'C/T'};
+  const vals={D6:clean(data.mbl),G6:clean(p.hbl).replace(/-/g,''),I6:'JSSY',D7:clean(p.name),D8:clean(p.passport),D9:'REPUBLIC OF KOREA',E8:clean(p.origin1),E9:clean(p.origin2),E10:'',E11:'',H8:clean(p.destination),H9:clean(p.destination2),H10:'',H11:'',H13:clean(p.container),B19:clean(p.pol),E19:clean(p.pod),G22:clean(p.quantity)+'C/T'};
   for(const [ref,val] of Object.entries(vals))xml=cell(xml,ref,val);
   xml=cell(xml,'D10',dateSerial(p.birth),true);xml=cell(xml,'H19',dateSerial(data.etd),true);zip.file(file,xml);
  }
